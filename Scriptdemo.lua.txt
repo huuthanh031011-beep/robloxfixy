@@ -1,0 +1,103 @@
+-- Tải thư viện UI
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V2/refs/heads/main/UiREDzV2.lua")))()
+
+-- Tạo cửa sổ chính
+local Window = MakeWindow({
+    Hub = {
+        Title = "Universal Menu - Hùng dz",
+        Animation = "Đang khởi tạo hệ thống..."
+    },
+    Key = {
+        KeySystem = false,
+        Title = "Hệ thống Key",
+        Keys = {"1234"}
+    }
+})
+
+-- Nút thu nhỏ
+MinimizeButton({
+    Image = "https://i.supaimg.com/a8b77bf5-fb5b-48a8-be84-4fbc7307416b/5353fc92-03a4-4acf-a566-4564addf70a3.jpg",
+    Size = {60, 60},
+    Color = Color3.fromRGB(10, 10, 10),
+    Corner = true
+})
+
+--- TẠO TAB
+local Tab1 = MakeTab({Name = "Người Chơi"})
+local Tab2 = MakeTab({Name = "Hiển Thị"})
+
+--- TẠO SECTION (Đây là phần quan trọng để sửa lỗi trống trơn)
+local SectionPlayer = AddSection(Tab1, {Name = "Chỉ số nhân vật"})
+local SectionVisuals = AddSection(Tab2, {Name = "Hỗ trợ quan sát"})
+
+------- TAB NGƯỜI CHƠI (Sửa lỗi hiển thị)
+
+-- Slider Tốc độ
+AddSlider(SectionPlayer, {
+    Name = "Tốc độ chạy",
+    Min = 16,
+    Max = 300,
+    Default = 16,
+    Callback = function(Value)
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+        end
+    end
+})
+
+-- Slider Nhảy cao
+AddSlider(SectionPlayer, {
+    Name = "Độ cao nhảy",
+    Min = 50,
+    Max = 500,
+    Default = 50,
+    Callback = function(Value)
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+            game.Players.LocalPlayer.Character.Humanoid.JumpPower = Value
+            game.Players.LocalPlayer.Character.Humanoid.UseJumpPower = true
+        end
+    end
+})
+
+-- Toggle Nhảy vô hạn
+AddToggle(SectionPlayer, {
+    Name = "Nhảy vô hạn",
+    Default = false,
+    Callback = function(Value)
+        _G.InfJump = Value
+        game:GetService("UserInputService").JumpRequest:Connect(function()
+            if _G.InfJump then
+                game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+            end
+        end)
+    end
+})
+
+------- TAB HIỂN THỊ
+
+-- Toggle ESP
+AddToggle(SectionVisuals, {
+    Name = "Định vị người chơi (ESP)",
+    Default = false,
+    Callback = function(Value)
+        _G.ESP_Global = Value
+        while _G.ESP_Global do
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer and player.Character then
+                    if not player.Character:FindFirstChild("Highlight") then
+                        local hl = Instance.new("Highlight", player.Character)
+                        hl.FillColor = Color3.fromRGB(255, 0, 0)
+                        hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+                    end
+                end
+            end
+            task.wait(1)
+        end
+        -- Xóa khi tắt
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("Highlight") then
+                player.Character.Highlight:Destroy()
+            end
+        end
+    end
+})
